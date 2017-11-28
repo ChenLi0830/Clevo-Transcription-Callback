@@ -5,7 +5,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const debug = require('debug')('app')
 // const convertAudioToWav = require('./convertAudioToWav')
-// const handler = require('./handler')
+const { saveTranscription } = require('./handler')
 
 // parse body
 app.use(bodyParser.json()) // to support JSON-encoded bodies
@@ -18,11 +18,22 @@ app.get('/', (req, res) => {
   return res.send("Transcription Service is up :D! Make use of it by posting with param 'url'")
 })
 
+// app.put('/', function (req, res) {
+//   debug('put req to /', req.body)
+//   return res.send('Got put put request')
+// })
+
 app.post('/', (req, res) => {
   debug('post req to /', req.body)
-  //   if (!req.body.url) {
-  //     return res.send('No audio url!')
-  //   }
+
+  if (!req.body.id) {
+    return res.send('Not audio transcription callback!')
+  }
+
+  saveTranscription(req.body)
+  .then(() => {
+    res.send('POST request received at /')
+  })
   //   handler(req.body.url)
   // convertAudioToWav(req.body.url)
   //   .then(result => {
@@ -32,7 +43,6 @@ app.post('/', (req, res) => {
   //   console.log('req', Object.keys(req))
   //   console.log('req.body', req.body)
   //   console.log('req.params', req.params)
-  res.send('Got a POST request')
 })
 
 const port = process.env.PORT || 3000
